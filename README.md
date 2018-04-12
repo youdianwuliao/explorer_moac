@@ -1,8 +1,8 @@
-# ETCExplorer 
+# MOACExplorer 
 
 <b>Live Version: [etherhub.io](http://etherhub.io)</b>
 
-Follow the project progress at: [ETC Block Explorer Development](https://trello.com/b/W3ftl57z/etc-block-explorer-development) 
+Follow the project progress at: [ETC Block Explorer Development](https://trello.com/b/W3ftl57z/etc-block-explorer-development)
 
 ## Local installation
 
@@ -31,7 +31,7 @@ Configuration file: `/tools/config.json`
 Basic settings:
 ```json
 {
-    "gethPort": 8545, 
+    "gethPort": 8545,
     "blocks": [ {"start": 2000000, "end": "latest"}],
     "quiet": false,
     "terminateAtExistingDB": true,
@@ -39,13 +39,13 @@ Basic settings:
 }
 ```
 
-```blocks``` is a list of blocks to grab. It can be specified as a list of block numbers or an interval of block numbers. When specified as an interval, it will start at the ```end``` block and keep recording decreasing block numbers. 
+```blocks``` is a list of blocks to grab. It can be specified as a list of block numbers or an interval of block numbers. When specified as an interval, it will start at the ```end``` block and keep recording decreasing block numbers.
 
 ```terminateAtExistingDB``` will terminate the block grabber once it gets to a block it has already stored in the DB.
 
 ```quiet``` prints out the log of what it is doing.
 
-```listenOnly``` When true, the grabber will create a filter to receive the latest blocks from geth as they arrive. It will <b>not</b> continue to populate older block numbers. 
+```listenOnly``` When true, the grabber will create a filter to receive the latest blocks from geth as they arrive. It will <b>not</b> continue to populate older block numbers.
 
 <b>Note: When ```listenOnly``` is set to ```true```, the ```blocks``` option is ignored. </b>
 
@@ -61,4 +61,4 @@ Leave this running in the background to continuously fetch new blocks.
 
 Tools for updating network stats are under development, but can be found in:
 
-`./tools/stats.js` 
+`./tools/stats.js`
