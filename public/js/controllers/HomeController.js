@@ -1,5 +1,5 @@
 angular.module('BlocksApp').controller('HomeController', function($rootScope, $scope, $http, $timeout) {
-    $scope.$on('$viewContentLoaded', function() {   
+    $scope.$on('$viewContentLoaded', function() {
         // initialize core components
         App.initAjax();
     });
@@ -19,7 +19,7 @@ angular.module('BlocksApp').controller('HomeController', function($rootScope, $s
         $scope.latest_blocks = data.blocks;
       });
     }
-    
+
 
     $scope.reloadTransactions = function() {
       $scope.txLoading = true;
@@ -30,7 +30,7 @@ angular.module('BlocksApp').controller('HomeController', function($rootScope, $s
       }).success(function(data) {
         $scope.latest_txs = data.txs;
         $scope.txLoading = false;
-      });  
+      });
     }
 
     $scope.reloadBlocks();
@@ -54,15 +54,15 @@ angular.module('BlocksApp').controller('HomeController', function($rootScope, $s
       scope.stats.usdEth = 1;
 
 
-      
-      $http.post(etcEthURL, {"action": "etceth"})
+
+      $http.post(etcEthURL, {"action": "summary"})
        .then(function(res){
-          scope.stats.etcHashrate = res.data.etcHashrate;
-          scope.stats.ethHashrate = res.data.ethHashrate;
-          scope.stats.etcEthHash = res.data.etcEthHash;
-          scope.stats.ethDiff = res.data.ethDiff;
-          scope.stats.etcDiff = res.data.etcDiff;
-          scope.stats.etcEthDiff = res.data.etcEthDiff;
+          scope.stats.etcHashrate = res.data.hashrate;
+          scope.stats.ethHashrate = res.data.hashrate;
+          scope.stats.etcEthHash = res.data.hashrate;
+          scope.stats.ethDiff = res.data.difficulty;
+          scope.stats.etcDiff = res.data.difficulty;
+          scope.stats.etcEthDiff = res.data.difficulty;
         });
       $http.get(etcPriceURL)
        .then(function(res){
@@ -79,4 +79,3 @@ angular.module('BlocksApp').controller('HomeController', function($rootScope, $s
       }
   }
 });
-

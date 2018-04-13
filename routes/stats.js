@@ -8,16 +8,19 @@ module.exports = function(req, res) {
 
   if (!("action" in req.body))
     res.status(400).send();
-  
-  else if (req.body.action=="miners") 
+
+  else if (req.body.action=="miners")
     getMinerStats(res)
-  
-  else if (req.body.action=="hashrate") 
+
+  else if (req.body.action=="hashrate")
     getHashrate(res);
-  
-  else if (req.body.action=="etceth") 
+
+  else if (req.body.action=="etceth")
     getEtcEth(res);
-  
+
+  else if (req.body.action=="summary")
+    getSummary(res);
+
 
 }
 
@@ -27,7 +30,7 @@ module.exports = function(req, res) {
 var getMinerStats = function(res) {
   BlockStat.aggregate([
       { $group: {
-        _id: '$miner',  
+        _id: '$miner',
         count: {$sum: 1} }
       }
   ], function (err, result) {
@@ -47,13 +50,29 @@ var getMinerStats = function(res) {
 var getHashrate = function(res) {
   var hashFind = BlockStat.find({}, "difficulty blockTime")
                             .lean(true).limit(64).sort('-number');
-    
+
   // highest difficulty / avg blocktime
   hashFind.exec(function (err, docs) {
-    var x = docs.reduce( function(hashR, doc) { 
-                            return { "blockTime": hashR.blockTime + doc.blockTime, 
+    var x = docs.reduce( function(hashR, doc) {
+                            return { "blockTime": hashR.blockTime + doc.blockTime,
                                      "difficulty": Math.max(hashR.difficulty, doc.difficulty) }
-                                 }, {"blockTime": 0, "difficulty": 0}); 
+                                 }, {"blockTime": 0, "difficulty": 0});
+    var hashrate = x.difficulty / (1000*x.blockTime / docs.length);
+    res.write(JSON.stringify({"hashrate": hashrate, "difficulty": x.difficulty}));
+    res.end();
+  });
+}
+
+var getSummary = function(res) {
+  var hashFind = BlockStat.find({}, "difficulty blockTime")
+                            .lean(true).limit(64).sort('-number');
+
+  // highest difficulty / avg blocktime
+  hashFind.exec(function (err, docs) {
+    var x = docs.reduce( function(hashR, doc) {
+                            return { "blockTime": hashR.blockTime + doc.blockTime,
+                                     "difficulty": Math.max(hashR.difficulty, doc.difficulty) }
+                                 }, {"blockTime": 0, "difficulty": 0});
     var hashrate = x.difficulty / (1000*x.blockTime / docs.length);
     res.write(JSON.stringify({"hashrate": hashrate, "difficulty": x.difficulty}));
     res.end();
@@ -75,9 +94,9 @@ var getEtcEth = function(res) {
     method: 'GET',
     data: 'eth'
   }];
-  
+
   async.map(options, function(opt, callback) {
-    
+
     https.request(opt, function(mg) {
       mg.on('data', function (data) {
         try {
@@ -115,7 +134,7 @@ var getEtcEth = function(res) {
           "etcEthDiff": etcEthDiff
         }));
         res.end();
-      } 
+      }
     }
 
   });
