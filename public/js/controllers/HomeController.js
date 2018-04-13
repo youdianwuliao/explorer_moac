@@ -49,6 +49,7 @@ angular.module('BlocksApp').controller('HomeController', function($rootScope, $s
       var etcEthURL = "/stats";
       var etcPriceURL = "https://api.coinmarketcap.com/v1/ticker/ethereum-classic/";
       var ethPriceURL = "https://api.coinmarketcap.com/v1/ticker/ethereum/"
+      var moacPriceURL = "https://api.coinmarketcap.com/v1/ticker/MOAC/?convert=USD"
       scope.stats.ethDiff = 1;
       scope.stats.ethHashrate = 1;
       scope.stats.usdEth = 1;
@@ -64,7 +65,7 @@ angular.module('BlocksApp').controller('HomeController', function($rootScope, $s
           scope.stats.etcDiff = res.data.etcDiff;
           scope.stats.etcEthDiff = res.data.etcEthDiff;
         });
-      $http.get(etcPriceURL)
+      $http.get(moacPriceURL)
        .then(function(res){
           scope.stats.usdEtc = parseFloat(res.data[0]["price_usd"]);
           scope.stats.usdEtcEth = parseInt(100*scope.stats.usdEtc/scope.stats.usdEth);
