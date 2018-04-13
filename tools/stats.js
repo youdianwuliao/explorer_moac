@@ -2,29 +2,31 @@
   Tool for calculating block stats
 */
 
-var Web3 = require('web3');
+var Chain3 = require('chain3');
 
 var mongoose = require( 'mongoose' );
 var BlockStat = require( '../db-stats.js' ).BlockStat;
 
-var updateStats = function() {
-    var web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545')); 
+var config = require('./config');
 
-    mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost/blockDB');
+var updateStats = function() {
+    var chain3 = new Chain3(new Chain3.providers.HttpProvider('http://' + config.gethHost.toString() + ':' + config.gethPort.toString()));
+
+    mongoose.connect(process.env.MONGO_URI || 'mongodb://' + config.mongoHost.toString() + '/blockDB');
     mongoose.set('debug', true);
 
-    var latestBlock = web3.eth.blockNumber;
-    getStats(web3, latestBlock, null, latestBlock - 1000);
+    var latestBlock = chain3.mc.blockNumber;
+    getStats(chain3, latestBlock, null, latestBlock - 1000);
 }
 
 
-var getStats = function(web3, blockNumber, nextBlock, endBlock) {
+var getStats = function(chain3, blockNumber, nextBlock, endBlock) {
     if (blockNumber <= endBlock)
         process.exit(9);
 
-    if(web3.isConnected()) {
+    if(chain3.isConnected()) {
 
-        web3.eth.getBlock(blockNumber, true, function(error, blockData) {
+        chain3.mc.getBlock(blockNumber, true, function(error, blockData) {
             if(error) {
                 console.log('Warning: error on getting block with hash/number: ' +
                     blockNumber + ': ' + error);
@@ -35,24 +37,24 @@ var getStats = function(web3, blockNumber, nextBlock, endBlock) {
             }
             else {
                 if (nextBlock)
-                    checkBlockDBExistsThenWrite(web3, blockData, nextBlock.timestamp);
+                    checkBlockDBExistsThenWrite(chain3, blockData, nextBlock.timestamp);
                 else
-                    checkBlockDBExistsThenWrite(web3, blockData, parseInt(Date.now()/1000));
+                    checkBlockDBExistsThenWrite(chain3, blockData, parseInt(Date.now()/1000));
             }
         });
     } else {
-        console.log('Error: Aborted due to web3 is not connected when trying to ' +
+        console.log('Error: Aborted due to chain3 is not connected when trying to ' +
             'get block ' + blockNumber);
         process.exit(9);
     }
 }
 
 /**
-  * Checks if the a record exists for the block number 
+  * Checks if the a record exists for the block number
   *     if record exists: abort
   *     if record DNE: write a file for the block
   */
-var checkBlockDBExistsThenWrite = function(web3, blockData, nextTime) {
+var checkBlockDBExistsThenWrite = function(chain3, blockData, nextTime) {
     BlockStat.find({number: blockData.number}, function (err, b) {
         if (!b.length) {
             // calc hashrate, txCount, blocktime, uncleCount
@@ -70,18 +72,18 @@ var checkBlockDBExistsThenWrite = function(web3, blockData, nextTime) {
             new BlockStat(stat).save( function( err, s, count ){
                 console.log(s)
                 if ( typeof err !== 'undefined' && err ) {
-                   console.log('Error: Aborted due to error on ' + 
-                        'block number ' + blockData.number.toString() + ': ' + 
+                   console.log('Error: Aborted due to error on ' +
+                        'block number ' + blockData.number.toString() + ': ' +
                         err);
                    process.exit(9);
                 } else {
                     console.log('DB successfully written for block number ' +
-                        blockData.number.toString() );    
-                    getStats(web3, blockData.number - 1, blockData);     
+                        blockData.number.toString() );
+                    getStats(chain3, blockData.number - 1, blockData);
                 }
             });
         } else {
-            console.log('Aborting because block number: ' + blockData.number.toString() + 
+            console.log('Aborting because block number: ' + blockData.number.toString() +
                 ' already exists in DB.');
             return;
         }
@@ -90,11 +92,11 @@ var checkBlockDBExistsThenWrite = function(web3, blockData, nextTime) {
 }
 
 /** On Startup **/
-// geth --rpc --rpcaddr "localhost" --rpcport "8545"  --rpcapi "eth,net,web3"
+// geth --rpc --rpcaddr "localhost" --rpcport "8545"  --rpcapi "eth,net,chain3"
 
 var minutes = 1;
 statInterval = minutes * 60 * 1000;
 
-setInterval(function() {
+// setInterval(function() {
   updateStats();
-}, statInterval);
+// }, statInterval);

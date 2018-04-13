@@ -4,14 +4,14 @@
     Endpoint for client interface with ERC-20 tokens
 */
 
-var eth = require('./web3relay').eth;
+var mc = require('./web3relay').mc;
 
 var BigNumber = require('bignumber.js');
 var etherUnits = require(__lib + "etherUnits.js")
 
 const ABI = [{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"}];
 
-const Contract = eth.contract(ABI);
+const Contract = mc.contract(ABI);
 
 
 module.exports = function(req, res){
@@ -25,21 +25,21 @@ module.exports = function(req, res){
     res.status(400).send();
   else if (req.body.action=="info") {
     try {
-      var actualBalance = eth.getBalance(contractAddress);
+      var actualBalance = mc.getBalance(contractAddress);
       actualBalance = etherUnits.toEther(actualBalance, 'wei');
       var totalSupply = Token.totalSupply();
       // totalSupply = etherUnits.toEther(totalSupply, 'wei')*100;
       var decimals = Token.decimals();
       var name = Token.name();
       var symbol = Token.symbol();
-      var count = eth.getTransactionCount(contractAddress);
+      var count = mc.getTransactionCount(contractAddress);
       var tokenData = {
         "balance": actualBalance,
         "total_supply": totalSupply,
         "count": count,
         "name": name,
         "symbol": symbol,
-        "bytecode": eth.getCode(contractAddress)
+        "bytecode": mc.getCode(contractAddress)
       }
       res.write(JSON.stringify(tokenData));
       res.end();
@@ -56,8 +56,8 @@ module.exports = function(req, res){
     } catch (e) {
       console.error(e);
     }
-  } 
-  
-};  
+  }
+
+};
 
 const MAX_ENTRIES = 50;

@@ -1,6 +1,9 @@
 {
-    "gethPort": 8545, 
-    "blocks": [ {"start": 2000000, "end": "latest"}],
+    "mongoHost": "localhost",
+    "gethHost": "localhost",
+    "gethPort": 8545,
+    "blocks": [ {"start": 0, "end": "latest"}],
+    "skipTransactions": false,
     "quiet": false,
     "terminateAtExistingDB": false,
     "listenOnly": true
