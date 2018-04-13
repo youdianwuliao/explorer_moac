@@ -17,9 +17,9 @@ module.exports = function(app){
   var fiat = require('./fiat');
   var stats = require('./stats');
 
-  /* 
+  /*
     Local DB: data request format
-    { "address": "0x1234blah", "txin": true } 
+    { "address": "0x1234blah", "txin": true }
     { "tx": "0x1234blah" }
     { "block": "1234" }
   */
@@ -29,13 +29,13 @@ module.exports = function(app){
   app.post('/data', getData);
 
   app.post('/daorelay', DAO);
-  app.post('/tokenrelay', Token);  
+  app.post('/tokenrelay', Token);
   app.post('/web3relay', web3relay.data);
   app.post('/compile', compile);
 
   app.post('/fiat', fiat);
   app.post('/stats', stats);
-  
+
 
 }
 
@@ -49,20 +49,20 @@ var getAddr = function(req, res){
 
   var data = { draw: parseInt(req.body.draw), recordsFiltered: count, recordsTotal: count };
 
-  var addrFind = Transaction.find( { $or: [{"to": addr}, {"from": addr}] })  
+  var addrFind = Transaction.find( { $or: [{"to": addr}, {"from": addr}] })
 
   addrFind.lean(true).sort('-blockNumber').skip(start).limit(limit)
           .exec("find", function (err, docs) {
             if (docs)
-              data.data = filters.filterTX(docs, addr);      
-            else 
+              data.data = filters.filterTX(docs, addr);
+            else
               data.data = [];
             res.write(JSON.stringify(data));
             res.end();
           });
 
 };
- 
+
 
 
 var getBlock = function(req, res) {
@@ -78,6 +78,7 @@ var getBlock = function(req, res) {
       console.error(req.body);
       res.write(JSON.stringify({"error": true}));
     } else {
+      console.log('block', doc);
       var block = filters.filterBlocks([doc]);
       res.write(JSON.stringify(block[0]));
     }
@@ -122,18 +123,18 @@ var getData = function(req, res){
       var lim = MAX_ENTRIES;
     else
       var lim = parseInt(limit);
-    
+
     DATA_ACTIONS[action](lim, res);
 
   } else {
-  
+
     console.error("Invalid Request: " + action)
     res.status(400).send();
   }
 
 };
 
-/* 
+/*
   temporary blockstats here
 */
 var latestBlock = function(req, res) {
@@ -143,7 +144,7 @@ var latestBlock = function(req, res) {
     res.write(JSON.stringify(doc));
     res.end();
   });
-} 
+}
 
 
 var getLatest = function(lim, res, callback) {
@@ -178,4 +179,3 @@ const DATA_ACTIONS = {
   "latest_blocks": sendBlocks,
   "latest_txs": sendTxs
 }
-

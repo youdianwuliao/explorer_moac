@@ -16,7 +16,7 @@ var filterBlocks = require('./filters').filterBlocks;
 var filterTrace = require('./filters').filterTrace;
 
 
-if (typeof web3 !== "undefined") {
+if (typeof chain3 !== "undefined") {
   chain3 = new Chain3(chain3.currentProvider);
 } else {
   chain3 = new Chain3(new Chain3.providers.HttpProvider("http://" + [config.gethHost.toString(), config.gethPort.toString()].join(':')));
@@ -145,7 +145,7 @@ exports.data = function(req, res){
         blockNumOrHash = parseInt(req.body.block);
     }
 
-    web3.eth.getBlock(blockNumOrHash, function(err, block) {
+    chain3.mc.getBlock(blockNumOrHash, function(err, block) {
       if(err || !block) {
         console.error("BlockWeb3 error :" + err)
         res.write(JSON.stringify({"error": true}));
