@@ -1,6 +1,6 @@
 {
     "mongoHost": "localhost",
-    "gethHost": "localhost",
+    "gethHost": "121.43.164.140",
     "gethPort": 8545,
     "blocks": [ {"start": 0, "end": "latest"}],
     "skipTransactions": false,
