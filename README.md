@@ -50,15 +50,3 @@ Basic settings:
 <b>Note: When ```listenOnly``` is set to ```true```, the ```blocks``` option is ignored. </b>
 
 <b>Note 2: ```terminateAtExistingDB``` and ```listenOnly``` are mutually exclusive. Do not use ```terminateAtExistingDB``` when in ```listenOnly``` mode.</b>
-
-### Run:
-
-`node ./tools/grabber.js`
-
-Leave this running in the background to continuously fetch new blocks.
-
-### Stats
-
-Tools for updating network stats are under development, but can be found in:
-
-`./tools/stats.js`
