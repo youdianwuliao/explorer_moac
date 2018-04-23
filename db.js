@@ -58,6 +58,6 @@ module.exports.Block = mongoose.model('Block');
 module.exports.Contract = mongoose.model('Contract');
 module.exports.Transaction = mongoose.model('Transaction');
 
-var config = require('./tools/config');
-mongoose.connect(process.env.MONGO_URI || 'mongodb://' + config.mongoHost.toString() + '/blockDB');
+var config = require('./config');
+mongoose.connect(process.env.MONGO_URI || 'mongodb://'+config.mongouname.toString()+':'+config.mongopasswd.toString()+'@'+ config.mongoHost.toString() + '/blockDB');
 mongoose.set('debug', true);
