@@ -1,3 +1,4 @@
+
 # MOACExplorer 
 
 <b>Live Version: [moac.io](http://moac.io)</b>
@@ -25,8 +26,11 @@ Ubuntu: `sudo apt-get install -y mongodb-org`
 ## Populate the DB
 
 This will fetch and parse the entire blockchain.
+
 create the config
+
 vim config.json
+
 Configuration file: `config.json`
 
 Basic settings:
