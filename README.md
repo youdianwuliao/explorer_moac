@@ -25,8 +25,9 @@ Ubuntu: `sudo apt-get install -y mongodb-org`
 ## Populate the DB
 
 This will fetch and parse the entire blockchain.
-
-Configuration file: `/tools/config.json`
+create the config
+vim config.json
+Configuration file: `config.json`
 
 Basic settings:
 ```json
