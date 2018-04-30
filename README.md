@@ -32,12 +32,19 @@ Configuration file: `config.json`
 Basic settings:
 ```json
 {
+    "mongoHost": "localhost",
+    "mongouname":"",
+    "mongopasswd":"",
+    "gethHost": "localhost",
     "gethPort": 8545,
-    "blocks": [ {"start": 2000000, "end": "latest"}],
+    "blocks": [ {"start": 0, "end": "latest"}],
+    "skipTransactions": false,
     "quiet": false,
-    "terminateAtExistingDB": true,
-    "listenOnly": false
+    "terminateAtExistingDB": false,
+    "listenOnly": true,
+    "dbname":"blockDB"
 }
+
 ```
 
 ```blocks``` is a list of blocks to grab. It can be specified as a list of block numbers or an interval of block numbers. When specified as an interval, it will start at the ```end``` block and keep recording decreasing block numbers.
