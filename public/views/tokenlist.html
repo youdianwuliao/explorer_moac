@@ -1,11 +1,47 @@
+<head>
+<meta charset="utf-8">
+<script src="https://cdn.bootcss.com/angular.js/1.6.3/angular.min.js"></script>
+<style>
+table, td  {
+  border: 1px solid #ddd;
+  border-collapse: collapse;
+  padding: 5px;
+}
+table tr:nth-child(odd)	{
+  background-color: #f1f1f1;
+}
+table tr:nth-child(even) {
+  background-color: #ffffff;
+}
+th {
+  color: #3498db;
+  background-color: #ffffff;
+}
+.contract {
+  color: grey;
+}
+
+
+
+</style>
+</head>
 <div class="row ">
     <div class="col-md-12 portlet light">
         <div class="portlet-body">
 
             <table class="col-md-6 table">
-                <tr ng-repeat="t in tokens track by $index">
-                    <td> <a class="font-green" href="/token/{{t.address}}">{{t.name}} ({{t.symbol}})</a> </td>
-                    <td > <a href="/token/{{t.address}}">{{t.address}}</a> </td>
+                    <thead>
+                            <tr>
+                            	<!-- <th> Type </th> -->
+                                <th> Token Name </th>
+                                <th> Contract Address </th>
+                                
+                            </tr>
+                        </thead>
+                <tr ng-repeat="t in tokenList track by $index">
+<!--                 	<td > <a href="/token/{{t.address}}">{{}}</a> </td>
+ -->                    <td> <a class="font-blue" href="/token/{{t.address}}">{{t.tokenName}}({{t.symbol}}) </a></td>
+                    <td class="contract"> {{t.address}} </td>
                 </tr>
             </table>
         </div>

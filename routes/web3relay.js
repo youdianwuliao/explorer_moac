@@ -21,7 +21,9 @@ if (typeof chain3 !== "undefined") {
 } else {
   chain3 = new Chain3(new Chain3.providers.HttpProvider("http://" + [config.gethHost.toString(), config.gethPort.toString()].join(':')));
 }
+chain4 = new Chain3(new Chain3.providers.HttpProvider("http://" + [config.gethHost.toString(), config.gethPort.toString()].join(':')));
 
+console.log("-----------" + chain4.isConnected());
 if (chain3.isConnected())
   console.log("Chain3 connection established");
 else

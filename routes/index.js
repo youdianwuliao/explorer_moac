@@ -2,6 +2,8 @@ var mongoose = require( 'mongoose' );
 
 var Block     = mongoose.model( 'Block' );
 var Transaction = mongoose.model( 'Transaction' );
+var Token = mongoose.model('Token');
+var Contract = mongoose.model('Contract');
 var filters = require('./filters')
 
 
@@ -27,6 +29,8 @@ module.exports = function(app){
   app.post('/tx', getTx);
   app.post('/block', getBlock);
   app.post('/data', getData);
+  app.post('/token', sendTokens);
+  
 
   app.post('/daorelay', DAO);
   app.post('/tokenrelay', Token);
@@ -38,7 +42,6 @@ module.exports = function(app){
 
 
 }
-
 var getAddr = function(req, res){
   // TODO: validate addr and tx
   var addr = req.body.addr.toLowerCase();
@@ -171,6 +174,31 @@ var sendTxs = function(lim, res) {
           res.write(JSON.stringify({"txs": txs}));
           res.end();
         });
+}
+
+var sendTokens = function(req, res) {
+//	console.log(11111);
+//	Token.find({}).lean(true)//.sort('-createTime')//.limit(lim)
+//    .exec(function (err, ts) {
+//    	console.log(22222);
+//      res.write(JSON.stringify({"tokens": ts}));
+//      res.end();
+//    });
+	
+
+	  var tokenFind = Contract.find().lean(true);
+	  tokenFind.exec(function (err, doc) {
+	    if (!doc){
+	      res.write(JSON.stringify({}));
+	      res.end();
+	    } else {
+	      // filter transactions
+	      res.write(JSON.stringify({"tokens": doc}));
+	      res.end();
+	    }
+	  });
+
+
 }
 
 const MAX_ENTRIES = 10;
