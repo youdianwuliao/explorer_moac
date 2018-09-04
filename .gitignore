@@ -43,3 +43,4 @@ public/js/stats/The_bomb_chart.js
 tools/config.json
 config.json
 .node-xmlhttprequest-*
+.idea

@@ -59,5 +59,28 @@ module.exports.Contract = mongoose.model('Contract');
 module.exports.Transaction = mongoose.model('Transaction');
 
 var config = require('./config');
-mongoose.connect(process.env.MONGO_URI || 'mongodb://'+config.mongouname.toString()+':'+config.mongopasswd.toString()+'@'+ config.mongoHost.toString() + '/'+config.dbname.toString());
+mongoose.connect(process.env.MONGO_URI || 'mongodb://'+config.mongouname.toString()+':'+config.mongopasswd.toString()+'@'+ config.mongoHost.toString() + '/'+config.dbname.toString(), {
+    useMongoClient: true,
+    server: {
+        socketOptions: {
+            socketTimeoutMS: 0,
+                keepAlive : true
+        },
+        reconnectTries: 30
+    },
+    replset: {
+        socketOptions: {
+            socketTimeoutMS: 0,
+                keepAlive: true
+        },
+        reconnectTries: 30
+    },
+    mongos: {
+        socketOptions: {
+            socketTimeoutMS: 0,
+                keepAlive: true
+        },
+        reconnectTries: 30
+    }
+});
 mongoose.set('debug', true);
