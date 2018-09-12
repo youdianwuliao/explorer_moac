@@ -108,5 +108,10 @@ module.exports.Holder = mongoose.model('Holder');
 
 var config = require('./config');
 console.log(process.env.MONGO_URI || 'mongodb://'+ config.mongouname.toString()+':'+config.mongopasswd.toString()+'@' + config.mongoHost.toString() + '/'+config.dbname.toString());
-mongoose.connect(process.env.MONGO_URI || 'mongodb://'+config.mongouname.toString()+':'+config.mongopasswd.toString()+'@' + config.mongoHost.toString() + '/'+config.dbname.toString());
+mongoose.connect(process.env.MONGO_URI || 'mongodb://'+config.mongouname.toString()+':'+config.mongopasswd.toString()+'@' + config.mongoHost.toString() + '/'+config.dbname.toString(),
+    {
+        useMongoClient: true
+        /* other options */
+    })
+;
 mongoose.set('debug', true);
