@@ -1,0 +1,17 @@
+{
+    "mongoHost": "10.1.1.99",
+    "mongouname":"admin",
+    "mongopasswd":"123456",
+    "gethHost": "10.1.1.99",
+    "gethPort": 8106,
+    "blocks": [ {"start": 0, "end": "latest"}],
+    "startBlock":   0,
+    "endBlock":     "latest",
+    "skipTransactions": false,
+    "quiet": false,
+    "terminateAtExistingDB": false,
+    "listenOnly": true,
+    "dbname":"blockDB",
+    "syncAll": true
+}
+

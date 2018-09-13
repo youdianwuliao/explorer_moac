@@ -40,6 +40,6 @@ jspm_packages
 data/
 package-lock.json
 public/js/stats/The_bomb_chart.js
-tools/config.json
-config.json
+#tools/config.json
+#config.json
 .node-xmlhttprequest-*
