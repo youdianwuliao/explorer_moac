@@ -4,9 +4,10 @@
     Thing to get history of DAO transactions
 */
 
-var Web3 = require("web3");
-var web3;
+var Chain3 = require("chain3");
 var async = require('async');
+
+var fs = require('fs');
 
 require( '../../db.js' );
 require( '../../db-dao.js' );
@@ -17,20 +18,56 @@ var DAOCreatedToken = mongoose.model('DAOCreatedToken');
 var DAOTransferToken = mongoose.model('DAOTransferToken');
 var InternalTx     = mongoose.model( 'InternalTransaction' );
 
-if (typeof web3 !== "undefined") {
-  web3 = new Web3(web3.currentProvider);
-} else {
-  web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-}
 
-if (web3.isConnected()) 
-  console.log("Web3 connection established");
+
+/**
+ Start config for node connection and sync
+ **/
+var config = {};
+//Look for config.json file if not
+try {
+    var configContents = fs.readFileSync('config.json');
+    config = JSON.parse(configContents);
+    console.log('config.json found.');
+}
+catch (error) {
+    if (error.code === 'ENOENT') {
+        console.log('No config file found.');
+    }
+    else {
+        throw error;
+        process.exit(1);
+    }
+}
+// set the default NODE address to localhost if it's not provided
+if (!('nodeAddr' in config) || !(config.nodeAddr)) {
+    config.nodeAddr = 'localhost'; // default
+}
+// set the default geth port if it's not provided
+if (!('gethPort' in config) || (typeof config.gethPort) !== 'number') {
+    config.gethPort = 8545; // default
+}
+// set the default output directory if it's not provided
+if (!('output' in config) || (typeof config.output) !== 'string') {
+    config.output = '.'; // default this directory
+}
+// set the default size of array in block to use bulk operation.
+if (!('bulkSize' in config) || (typeof config.bulkSize) !== 'number') {
+    config.bulkSize = 100;
+}
+console.log('Connecting ' + config.nodeAddr + ':' + config.gethPort + '...');
+
+
+var chain3 = new Chain3(new Chain3.providers.HttpProvider('http://' + config.gethHost + ':' + config.gethPort.toString()));
+
+if (chain3.isConnected())
+  console.log("chain3 connection established");
 else
   throw "No connection";
 
 
 var daoABI = [{"anonymous":false,"inputs":[{"indexed":true,"name":"_from","type":"address"},{"indexed":true,"name":"_to","type":"address"},{"indexed":false,"name":"_amount","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_owner","type":"address"},{"indexed":true,"name":"_spender","type":"address"},{"indexed":false,"name":"_amount","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"value","type":"uint256"}],"name":"FuelingToDate","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"CreatedToken","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Refund","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"proposalID","type":"uint256"},{"indexed":false,"name":"recipient","type":"address"},{"indexed":false,"name":"amount","type":"uint256"},{"indexed":false,"name":"newCurator","type":"bool"},{"indexed":false,"name":"description","type":"string"}],"name":"ProposalAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"proposalID","type":"uint256"},{"indexed":false,"name":"position","type":"bool"},{"indexed":true,"name":"voter","type":"address"}],"name":"Voted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"proposalID","type":"uint256"},{"indexed":false,"name":"result","type":"bool"},{"indexed":false,"name":"quorum","type":"uint256"}],"name":"ProposalTallied","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_newCurator","type":"address"}],"name":"NewCurator","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_recipient","type":"address"},{"indexed":false,"name":"_allowed","type":"bool"}],"name":"AllowedRecipientChanged","type":"event"}];
-var daoContract = web3.eth.contract(daoABI);
+var daoContract = chain3.mc.contract(daoABI);
 var DAO = daoContract.at("0xbb9bc244d798123fde783fcc1c72d3bb8c189413");
 
 var creationBlock = 1428757;
@@ -103,7 +140,7 @@ var populateTransferTokens = function () {
             continue;
           }
           try {
-            var block = web3.eth.getBlock(log[l].blockNumber);
+            var block = chain3.mc.getBlock(log[l].blockNumber);
             newToken.timestamp = block.timestamp;
           } catch (e) {
             console.error(e);
@@ -160,7 +197,7 @@ var patchTimestamps = function(collection) {
     collection.find({timestamp: null}).forEach(function(doc) {
       setTimeout(function() {
         try {
-          var block = web3.eth.getBlock(doc.blockNumber);
+          var block = chain3.mc.getBlock(doc.blockNumber);
         } catch (e) {
           console.error(e); return;
         }
@@ -209,7 +246,7 @@ InternalTx.collection.count({timestamp: null}, function(err, c) {
 
 var min;
 
-var max = web3.eth.blockNumber;
+var max = chain3.mc.blockNumber;
 
 setInterval(function() {
   InternalTx.findOne({"timestamp": null}, "blockNumber")

@@ -285,6 +285,7 @@ var checkBlockDBExistsThenWrite = function(config, patchData, flush) {
     }
   });
 };
+
 /**
   Start config for node connection and sync
 **/
