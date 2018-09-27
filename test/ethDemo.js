@@ -683,8 +683,9 @@ web3.eth.getBlock(queryBlockNumber, true, function(error,blockData) {
             continue;
         }
         var code  = web3.eth.getCode(tx.to);
+        var receipt = web3.eth.getTransactionReceipt(tx.hash);
         if(code == "0x"){
-            var receipt = web3.eth.getTransactionReceipt(tx.hash);
+
             // receipt.status()
             console.log(txi+" 是否成功:"+(receipt.status=="0x1")+" logs tx hash: "+tx.hash+" 普通交易 "+tx.from+" to: "+tx.to+" value:"+tx.value+" 票据是否为空： "+ (receipt.logs.length==0));
 
@@ -693,9 +694,9 @@ web3.eth.getBlock(queryBlockNumber, true, function(error,blockData) {
             contract = web3.eth.contract(daoABI).at(tx.to);
 
             try{
-                console.log(txi+"   智能合约交易："+tx.hash+" "+contract.name()+" "+contract.symbol()+" "+contract.symbol()+" "+contract.totalSupply() );
+                console.log(txi+" 是否成功:"+(receipt.status=="0x1")+"   智能合约交易："+tx.hash+" "+contract.name()+" "+contract.symbol()+" "+contract.symbol()+" "+contract.totalSupply() );
             }catch (e) {
-                console.log(txi+" 非erc20交易 "+e);
+                console.log(txi+" 是否成功:"+(receipt.status=="0x1")+" 非erc20交易 "+e);
             }
 
 
