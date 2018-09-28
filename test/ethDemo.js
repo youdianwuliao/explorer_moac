@@ -670,7 +670,7 @@ var contract = web3.eth.contract(daoABI).at("0xb8c77482e45f1f44de1745f52c74426c6
 
 var queryBlockNumber = 6190953 ;
 abiDecoder.addABI(daoABI);
-// 交易记录
+// // 交易记录
 web3.eth.getBlock(queryBlockNumber, true, function(error,blockData) {
     if(null == error){
         console.log("开始解析block");
@@ -686,15 +686,49 @@ web3.eth.getBlock(queryBlockNumber, true, function(error,blockData) {
         var receipt = web3.eth.getTransactionReceipt(tx.hash);
         if(code == "0x"){
 
-            // receipt.status()
-            console.log(txi+" 是否成功:"+(receipt.status=="0x1")+" logs tx hash: "+tx.hash+" 普通交易 "+tx.from+" to: "+tx.to+" value:"+tx.value+" 票据是否为空： "+ (receipt.logs.length==0));
-
+            console.log(txi+" 票据是否为空： "+ (receipt.logs.length==0)+" 是否成功:"+(receipt.status=="0x1")+" logs tx hash: "+tx.hash+" 普通交易 "+tx.from+" to: "+tx.to+" value:"+tx.value);
 
         }else {
-            contract = web3.eth.contract(daoABI).at(tx.to);
+
 
             try{
-                console.log(txi+" 是否成功:"+(receipt.status=="0x1")+"   智能合约交易："+tx.hash+" "+contract.name()+" "+contract.symbol()+" "+contract.symbol()+" "+contract.totalSupply() );
+
+                if("0x" == tx.input){
+                    console.log(txi+"智能合约交易 票据是否为空： "+ (receipt.logs.length==0)+" 是否成功:"+(receipt.status=="0x1")+" 智能合约交易:无input  "+tx.hash+"  "+tx.input);
+                    if(receipt.logs.length>0){
+                        for(txLog in receipt.logs){
+                            if(receipt.logs[txLog].topics.length==3){
+
+                                console.log(txi+" 是否成功:"+(receipt.status=="0x1")+" from "+web3.fromDecimal(receipt.logs[txLog].topics[1])+"  "+web3.fromDecimal(receipt.logs[txLog].topics[2])+" v "+ web3.toDecimal(receipt.logs[txLog].data));
+
+                            }
+                        }
+                    }
+
+                }else{
+                    contract = web3.eth.contract(daoABI).at(tx.to);
+                    var decodeObj = abiDecoder.decodeMethod(tx.input);
+                    if (typeof(decodeObj) != "undefined") {
+                        var params = decodeObj.params;
+                        if(params[0].name == "_to" ){
+                            console.log(txi+" 是否成功:"+(receipt.status=="0x1")+" 智能合约交易: 有_to "+tx.hash+" 合约交易 合约地址:"+tx.to+contract.name()+" "+contract.symbol()+" "+contract.decimals()+" from:"+tx.from+"   toAddress: " + params[0].value+" value:"+ params[1].value);
+                        }else {
+                            console.log(txi+" 是否成功:"+(receipt.status=="0x1")+" 智能合约交易：无_to"+tx.hash+" "+contract.name()+" "+contract.symbol()+" "+contract.decimals()+" "+contract.totalSupply() );
+                        }
+                    }
+                    else {
+                        for(txLog in receipt.logs){
+                            if(receipt.logs[txLog].topics.length==3){
+
+                                console.log(txi+" 是否成功:"+(receipt.status=="0x1")+" from "+web3.fromDecimal(receipt.logs[txLog].topics[1])+"  "+web3.fromDecimal(receipt.logs[txLog].topics[2])+" v "+ web3.toDecimal(receipt.logs[txLog].data));
+
+                            }
+                        }
+                    }
+                }
+
+
+
             }catch (e) {
                 console.log(txi+" 是否成功:"+(receipt.status=="0x1")+" 非erc20交易 "+e);
             }
@@ -702,34 +736,57 @@ web3.eth.getBlock(queryBlockNumber, true, function(error,blockData) {
 
 
 
-            // var decodeObj = abiDecoder.decodeMethod(tx.input);
-            // if (typeof(decodeObj) != "undefined") {
-            //     var params = decodeObj.params;
-            //     if(params[0].name == "_to" ){
-            //         console.log(txi+" logs tx hash: "+tx.hash+" 合约交易 合约地址:"+tx.to+" from:"+tx.from+"   toAddress: " + params[0].value+" value:"+ params[1].value);
-            //     }else {
-            //         console.log(txi);
-            //     }
-            // }
+
         }
     }
 
 })
 
 //合约交易
-// var transaction = web3.eth.getTransaction("0x42bf70824f4fd9d7a8fba9ed4886ce348fdbf6515f79f5b70eed57a9d10eb788");
+// var transaction = web3.eth.getTransaction("0xf613fa2a3b8be201d924e253eaf3c7509bf805e32add03943dde4db4854b4a0b");
 // console.log(transaction.from);
 // var code  = web3.eth.getCode(transaction.to);
 // if(code == "0x"){
 //     console.log("普通合约");
 // }else{
 //     abiDecoder.addABI(daoABI);
-//     // contract = web3.eth.contract(daoABI).at(transaction.input);
+//
 //     contract = web3.eth.contract(daoABI).at(transaction.to);
 //
-//     console.log("智能合约:"+contract.name()+" "+contract.symbol());
+//     console.log("智能合约:"+contract.name()+" "+contract.symbol()+" "+contract.decimals()+" "+contract.totalSupply());
+//
+//
+//     // web3.toDecimal(contract.balanceOf(""))
+//
+//             try{
+//                 var decodeObj = abiDecoder.decodeMethod(transaction.input);
+//                 var receipt = web3.eth.getTransactionReceipt(transaction.hash);
+//                 if (typeof(decodeObj) != "undefined") {
+//                     var params = decodeObj.params;
+//                     if(params[0].name == "_to" ){
+//                         console.log(" 是否成功:"+(receipt.status=="0x1")+" logs tx hash: "+transaction.hash+" from:"+transaction.from+"   toAddress: " + params[0].value+" value:"+ params[1].value);
+//                     }else {
+//                         console.log(" logs tx hash: "+transaction.hash);
+//                     }
+//                 } else {
+//                     for(txLog in receipt.logs){
+//                         if(receipt.logs[txLog].topics.length==3){
+//
+//                             console.log(txLog+" 是否成功:"+(receipt.status=="0x1")+" from "+web3.fromDecimal(receipt.logs[txLog].topics[1])+"  "+web3.fromDecimal(receipt.logs[txLog].topics[2])+" v "+ web3.toDecimal(receipt.logs[txLog].data));
+//
+//                         }
+//                     }
+//
+//                 }
+//
+//             }catch (e) {
+//                 console.log(" 是否成功:"+(receipt.status=="0x1")+" 非erc20交易 "+e);
+//             }
+//
+//
 // }
-
+// web3.toDecimal 16进制转10进制
+// web3.fromDecimal("") topic [1] [2] 转16进制 去掉多余的零
 // 失败的交易:0x42bf70824f4fd9d7a8fba9ed4886ce348fdbf6515f79f5b70eed57a9d10eb788  成功交易: 0xea32c5c3646c67641ff89169be7a3ab55a101bbf7040c7349ec59de9010824d8
 //创建合约
 // var transaction = web3.eth.getTransaction("0x61b7ca90e6ca5083af1035fc262159d855c54036a51782e50b7fc414589c0044");
